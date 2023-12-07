@@ -41,6 +41,7 @@ class DrawingApp:
         self.rectangles = []
         self.triangles = []
         self.polygons = []
+        self.disk_show = False
 
         self.xy = [(200, 200), (300, 300)]
 
@@ -59,13 +60,62 @@ class DrawingApp:
         return tuple(background_color)
 
     def choose_line_width(self):
-        root = tk.Tk()
-        root.withdraw()
+        # root = tk.Tk()
+        # root.withdraw()
 
         number = simpledialog.askfloat("Enter Float Number", "Please enter a float number:")
 
         return float(number)
+    def menu_simpledialog(self):
+        root = tk.Tk()
+        root.title("Select Line Style")
 
+        option = ['линия', 'треугольник', 'прямоугольник', 'многоугольник', 'тип линии', 'толщина линии', 'цвет фона',
+                  'заливка объекта', 'масштаб']
+
+        # Create a combobox with the available line styles
+        option_combo = ttk.Combobox(root, values=option)
+        option_combo.pack()
+
+        def on_select():
+            option = option_combo.get()
+            if option == 'тип линии':
+                self.choose_line_style()
+            elif option == 'толщина линии':
+                self.set_line_width(self.choose_line_width())
+            elif option == 'линия':
+                self.xy = self.ask_coordinates(2)
+                self.lines.append(self.xy)
+            elif option == 'прямоугольник':
+                self.xy = self.ask_coordinates(2)
+                self.rectangles.append(self.xy)
+                self.drawing_function = self.draw_rectangle
+            elif option == 'треугольник':
+                self.xy = self.ask_coordinates(3)
+                self.triangles.append(self.xy)
+                self.drawing_function = self.draw_triangle
+            elif option == 'многоугольник':
+                num_of_coord = self.ask_integer()
+                self.xy = self.ask_coordinates(num_of_coord)
+                self.polygons.append(self.xy)
+                self.drawing_function = self.draw_polygon
+            elif option == 'цвет фона':
+                self.set_background_color(self.choose_background_color())
+            elif option == 'заливка объекта':
+                self.set_object_color(self.choose_fill_color())
+            elif option == 'толщина линии':
+                self.set_line_width(self.choose_line_width())
+            elif option == 'масштаб':
+                factor = simpledialog.askfloat("Множитель", f"Пожалуйста, введите множитель изменения масштаба")
+                self.set_scale_factor(self.scale_factor * factor)
+
+
+        select_button = ttk.Button(root, text="Выбрать", command=on_select, width=21)
+        select_button.pack()
+        select_button = ttk.Button(root, text="Применить изменения", command=lambda : root.destroy())
+        select_button.pack()
+
+        root.mainloop()
     def choose_line_style(self):
         root = tk.Tk()
         root.title("Select Line Style")
@@ -78,7 +128,6 @@ class DrawingApp:
 
         def on_select():
             line_style = line_style_combo.get()
-            print("Selected Line Style:", line_style)
             self.num_style = line_style
             self.line_type = line_style
             root.destroy()
@@ -96,8 +145,8 @@ class DrawingApp:
         return tuple(fill_color)
 
     def ask_coordinates(self, num_coordinates):
-        root = tk.Tk()
-        root.withdraw()
+        # root = tk.Tk()
+        # root.withdraw()
 
         coordinates = []
 
@@ -129,15 +178,16 @@ class DrawingApp:
         glColor4fv(self.object_color)
         glLineWidth(self.line_width)
 
-        if self.line_type == "Dashed Line":
+        #self.line_type = 'Dotted'
+        if self.line_type == "Dashed":
             glLineStipple(1, 0x0F0F)
             glEnable(GL_LINE_STIPPLE)
-        elif self.line_type == "Dotted Line":
+        elif self.line_type == "Dotted":
             glLineStipple(1, 0xAAAA)
             glEnable(GL_LINE_STIPPLE)
         else:
             glDisable(GL_LINE_STIPPLE)
-        glBegin(self.line_style)
+        glBegin(GL_LINES)
 
         x0 = self.xy[0][0]
         x1 = self.xy[1][0]
@@ -308,11 +358,20 @@ class DrawingApp:
                         self.drawing_function = self.draw_disk
                     elif event.key == K_s:
                         self.choose_line_style()
-                        #self.set_line_style(self.line_style)  # TODO Set line style to GL_LINES
+                    elif event.key == K_c:
+                        self.lines = []
+                        self.triangles = []
+                        self.rectangles = []
+                        self.polygons = []
                     elif event.key == K_EQUALS and pygame.key.get_mods() & pygame.KMOD_SHIFT:
                         self.set_scale_factor(self.scale_factor * 1.1)  # Increase scale factor by 10%
                     elif event.key == K_MINUS:
                         self.set_scale_factor(self.scale_factor * 0.9)  # Decrease scale factor by 10%
+                    else:
+                        self.menu_simpledialog()
+                elif event.type == MOUSEBUTTONDOWN:
+                    self.menu_simpledialog()
+
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
             glLoadIdentity()

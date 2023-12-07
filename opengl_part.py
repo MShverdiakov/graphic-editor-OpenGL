@@ -37,23 +37,23 @@ class DiskRenderer:
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
 
     def draw_disk(self):
-        quad = gluNewQuadric()
-        gluQuadricTexture(quad, GL_TRUE)
+        self.quad = gluNewQuadric()
+        gluQuadricTexture(self.quad, GL_TRUE)
 
         slices = 50
         inner_radius = 0.5
         outer_radius = 1.0
-        gluDisk(quad, inner_radius, outer_radius, slices, 1)
+        gluDisk(self.quad, inner_radius, outer_radius, slices, 1)
 
     def show_disk(self):
         pygame.init()
-        display = (400, 600)
+        display = (800, 600)
         pygame.display.set_mode(display, DOUBLEBUF|OPENGL)
         gluPerspective(45, (display[0]/display[1]), 0.1, 50.0)
         glTranslatef(0.0, 0.0, -5)
 
-        quad = gluNewQuadric()
-        gluQuadricTexture(quad, GL_TRUE)
+        self.quad = gluNewQuadric()
+        gluQuadricTexture(self.quad, GL_TRUE)
 
         self.load_texture()
 
@@ -78,7 +78,7 @@ class DiskRenderer:
 
             glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
             glRotatef(1, 3, 1, 1)
-            self.draw_disk(quad)
+            self.draw_disk()
             pygame.display.flip()
             pygame.time.wait(10)
 
@@ -99,3 +99,7 @@ class DiskRenderer:
             glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
             glRotatef(1, 3, 1, 1)
             self.draw_disk()
+
+def run_disk():
+    disk = DiskRenderer()
+    disk.show_disk()

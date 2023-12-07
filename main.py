@@ -26,9 +26,16 @@ class DrawingApp:
         self.line_style = GL_LINES  # Initial line style
         self.scale_factor = 1.0  # Initial scale factor
 
+
+        # Create a button instance
+        self.button1 = Button(300, 250, 200, 100, "Click Me")
+
         self.drawing_function = self.draw_line  # Initial drawing function
 
         self.set_background_color(self.background_color)  # Set initial background color
+
+    def get_width(self):
+        return float(self.line_width)
 
     def draw_line(self):
         glColor4fv(self.object_color)
@@ -102,11 +109,11 @@ class DrawingApp:
                     elif event.key == K_4:
                         self.drawing_function = self.draw_triangle
                     elif event.key == K_b:
-                        self.set_background_color(editor.choose_background_color())  # Set background color to white
+                        self.set_background_color(self.choose_background_color())  # Set background color to white
                     elif event.key == K_f:
-                        self.set_object_color(editor.choose_fill_color())  # Set object color to green
+                        self.set_object_color(self.choose_fill_color())  # Set object color to green
                     elif event.key == K_w:
-                        self.set_line_width(editor.set_line_width())  # Set line width to 1.0g
+                        self.set_line_width(self.set_line_width())  # Set line width to 1.0g
                     elif event.key == K_6:
                         self.set_line_width(3.0)  # Set line width to 3.0
                     elif event.key == K_7:
@@ -186,7 +193,7 @@ class ImageEditor:
         # Menu for using OpenGL
         object_menu = tk.Menu(menubar, tearoff=0)
         object_menu.add_command(label="run app", command=run_app)
-        object_menu.add_command(label="draw disk", command=opengl_part.show_disk)
+        object_menu.add_command(label="draw disk", command=opengl_part.run_disk)
         menubar.add_cascade(label="use OpenGL", menu=object_menu)
 
         self.root.config(menu=menubar)
@@ -416,6 +423,6 @@ class ImageEditor:
 
 
 # Create an instance of the image editor and run it
-editor = ImageEditor()
-editor.run()
+# editor = ImageEditor()
+# editor.run()
 
